@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" data-build="{{ build.id }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F2EFE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101114" media="(prefers-color-scheme: dark)">
+<meta name="format-detection" content="telephone=no">
+<meta name="description" content="Unofficial wayfinder for Singapore FinTech Festival 2026 at Singapore EXPO. Not affiliated with SFF, MAS, GFTN or Singapore EXPO.">
+<title>{{ config.name }} · unofficial</title>
+<link rel="icon" href="{{ assets.icon }}" type="image/svg+xml">
+<link rel="stylesheet" href="{{ assets.css }}">
+<script defer src="{{ assets.js }}"></script>
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <div class="top-row">
+      <h1>{{ config.name }}</h1>
+      <div class="top-tools">
+        <button type="button" class="lang" id="lang" aria-label="Language / 语言">中文</button>
+        <button type="button" class="info" id="about-open" aria-label="About">i</button>
+      </div>
+    </div>
+    <p class="unofficial" data-t="unofficial">Unofficial · not affiliated with SFF, MAS, GFTN or Singapore EXPO</p>
+  </header>
+
+  <div class="search">
+    <input type="search" id="q" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="search"
+      placeholder="Booth, exhibitor, stage, toilet…" aria-label="Search">
+  </div>
+
+  <main id="view"></main>
+
+  <noscript><p class="note">This map needs JavaScript. The organiser's own map is at <a href="{{ config.official }}">{{ config.official }}</a>.</p></noscript>
+</div>
+
+<div class="here" id="here"></div>
+<div class="toast" id="toast" hidden></div>
+<dialog class="sheet" id="sheet"></dialog>
+
+<script type="application/json" id="data">{{ data | json }}</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{# One hall, upright: entrance side at the bottom. Units are metres. Drawn by src/floorplan.ts hallDrawing(). #}
+<svg xmlns="http://www.w3.org/2000/svg" class="hallmap" viewBox="0 0 {{ W }} {{ H + band }}" data-hall="{{ hall }}">
+<rect class="floor" width="{{ W }}" height="{{ H }}" rx="2"/>
+{% for s in shapes %}
+<polygon class="{{ s.kind }}" data-k="{{ s.key }}" data-c="{{ s.cx }},{{ s.cy }}"{% if s.title %} data-t="{{ s.title }}"{% endif %} points="{{ s.points }}"/>
+{% endfor %}
+{% for s in shapes %}
+{% if s.label %}
+<text class="l-{{ s.kind }}{% if s.cap %} cap{% endif %}" font-size="{{ s.label.size }}">{% for line in s.label.lines %}<tspan x="{{ s.cx }}" y="{{ line.y }}">{{ line.text }}</tspan>{% endfor %}</text>
+{% endif %}
+{% endfor %}
+<rect class="band" y="{{ H }}" width="{{ W }}" height="{{ band }}"/>
+<text class="band-t" x="{{ W / 2 }}" y="{{ H + band * 0.7 }}" font-size="{{ text }}">ENTRANCE SIDE</text>
+{% for p in points %}
+<g class="poi {{ p.kind }}" data-k="{{ p.key }}" data-c="{{ p.x }},{{ p.y }}" transform="translate({{ p.x }} {{ p.y }})"><circle r="{{ small * 1.15 }}"/><text font-size="{{ small * 0.9 }}" y="{{ small * 0.32 }}">{{ "WC" if p.kind == "wc" else "IN" }}</text></g>
+{% endfor %}
+</svg>

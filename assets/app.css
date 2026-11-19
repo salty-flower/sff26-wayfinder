@@ -1,0 +1,889 @@
+/*
+ * SFF 2026 Wayfinder. Paper, ink, and one colour per hall.
+ * Colour means one thing only: which hall.
+ */
+:root {
+  --paper: #f2efe6;
+  --card: #faf8f2;
+  --ink: #16181d;
+  --ink2: #4d5159;
+  --ink3: #878a91;
+  --rule: #d8d3c6;
+  --rule2: #bfb9aa;
+  --hall1: #d6412b;
+  --hall2: #b87b00;
+  --hall3: #128657;
+  --hall4: #2360d0;
+  --hall5: #b4307c;
+  --hall6: #0a8497;
+  --on-hall: #fff;
+  --hl: #ffe680;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  --serif: ui-serif, "Iowan Old Style", Georgia, "Songti SC", "Noto Serif CJK SC", serif;
+  --mono: ui-monospace, "SF Mono", "Roboto Mono", Menlo, Consolas, monospace;
+  --pad: 16px;
+  --hc: var(--ink3);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #101114;
+    --card: #191b20;
+    --ink: #ece9e1;
+    --ink2: #a9abb1;
+    --ink3: #73767d;
+    --rule: #2b2e35;
+    --rule2: #3d4149;
+    --hall1: #ff7057;
+    --hall2: #f0b43c;
+    --hall3: #3fcb90;
+    --hall4: #71a0ff;
+    --hall5: #f272b8;
+    --hall6: #45cbe0;
+    --on-hall: #101114;
+    --hl: #5a4800;
+  }
+}
+
+.h1 { --hc: var(--hall1); }
+.h2 { --hc: var(--hall2); }
+.h3 { --hc: var(--hall3); }
+.h4 { --hc: var(--hall4); }
+.h5 { --hc: var(--hall5); }
+.h6 { --hc: var(--hall6); }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  background: var(--paper);
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 15px/1.55 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  overflow-wrap: break-word;
+  padding-bottom: calc(84px + env(safe-area-inset-bottom));
+}
+
+.shell {
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: env(safe-area-inset-top) max(var(--pad), env(safe-area-inset-right)) 0 max(var(--pad), env(safe-area-inset-left));
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+/* ------------------------------------------------------------ top */
+
+.top {
+  padding-top: 14px;
+}
+
+.top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+h1 {
+  margin: 0;
+  font: 700 21px/1.2 var(--serif);
+  letter-spacing: -0.01em;
+}
+
+.top-tools {
+  display: flex;
+  gap: 6px;
+}
+
+.lang,
+.info {
+  min-width: 44px;
+  height: 44px;
+  padding: 0 10px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: none;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.info {
+  font: italic 700 17px/1 var(--serif);
+}
+
+/* The label that this is nobody's official map: always the second thing on screen. */
+.unofficial {
+  margin: 8px 0 0;
+  padding: 5px 10px;
+  border: 1px dashed var(--rule2);
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink2);
+}
+
+.search {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  margin: 0 calc(-1 * var(--pad));
+  padding: 10px var(--pad);
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.search input,
+.pick-input {
+  width: 100%;
+  height: 50px;
+  padding: 0 16px;
+  border: 1.5px solid var(--ink);
+  border-radius: 14px;
+  background: var(--card);
+  color: inherit;
+  font: 600 16px/1 var(--sans);
+  outline: none;
+}
+
+.search input:focus,
+.pick-input:focus {
+  box-shadow: 0 0 0 3px var(--rule);
+}
+
+.note {
+  margin: 10px 2px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink3);
+}
+
+/* ------------------------------------------------------------ shared bits */
+
+.rd {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--hc);
+  color: var(--on-hall);
+  font: 700 12.5px/1 var(--mono);
+}
+
+.rows {
+  margin-top: 4px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  min-height: 52px;
+  padding: 6px 2px;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  background: none;
+  text-align: left;
+}
+
+.row-text {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+}
+
+.row-text b {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.row-text span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11.5px;
+  color: var(--ink2);
+}
+
+.row-extra {
+  flex: none;
+  font: 600 12px/1 var(--mono);
+  font-style: normal;
+  color: var(--ink2);
+}
+
+h2 {
+  margin: 22px 0 8px;
+  padding-top: 9px;
+  border-top: 2px solid var(--ink);
+  font: 700 16px/1.3 var(--serif);
+}
+
+.btn,
+.chip,
+.hall-btn,
+.back {
+  min-height: 44px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: none;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.btn {
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.btn.strong {
+  flex: 1;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* ------------------------------------------------------------ home */
+
+.whole {
+  margin-top: 4px;
+}
+
+.whole.big {
+  min-height: 120px;
+}
+
+.halls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.hall-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-color: color-mix(in srgb, var(--hc) 55%, var(--paper));
+  background: color-mix(in srgb, var(--hc) 12%, transparent);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 0 16px;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 10px;
+  padding: 0 14px;
+  border-color: var(--rule2);
+  color: var(--ink2);
+}
+
+.back::before {
+  content: "←";
+  font-family: var(--mono);
+}
+
+/* ------------------------------------------------------------ the hall card */
+
+.card {
+  padding: 10px;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  box-shadow: inset 0 4px 0 var(--hc);
+}
+
+.card-head {
+  padding: 6px 2px 0;
+}
+
+.card-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.card-title small {
+  flex-basis: 100%;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink2);
+}
+
+.card-title .where {
+  color: var(--ink3);
+}
+
+.route:empty {
+  display: none;
+}
+
+.route-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 10px;
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--ink2);
+}
+
+.route-text b {
+  font: 700 13px var(--mono);
+  color: var(--ink);
+}
+
+.sides {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+
+.side {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 5rem;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink2);
+}
+
+.side:last-child {
+  justify-content: flex-end;
+}
+
+.side i {
+  font-style: normal;
+  font-family: var(--mono);
+}
+
+.side .rd {
+  width: 18px;
+  height: 18px;
+  font-size: 10.5px;
+}
+
+.sides-back {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink3);
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  container-type: inline-size;
+}
+
+.hallmap,
+.ovmap {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ovmap {
+  height: auto;
+}
+
+.hallmap .floor {
+  fill: color-mix(in srgb, var(--hc) 6%, var(--paper));
+  stroke: var(--rule2);
+  stroke-width: 0.5;
+}
+
+.hallmap [data-k] {
+  cursor: pointer;
+}
+
+.hallmap .booth {
+  fill: color-mix(in srgb, var(--hc) 24%, var(--card));
+  stroke: var(--card);
+  stroke-width: 0.35;
+}
+
+.hallmap .area {
+  fill: color-mix(in srgb, var(--ink) 8%, var(--card));
+  stroke: var(--rule2);
+  stroke-width: 0.35;
+}
+
+.hallmap .stage {
+  fill: var(--ink);
+}
+
+.hallmap text {
+  text-anchor: middle;
+  font-family: var(--sans);
+  font-weight: 600;
+  fill: var(--ink2);
+  pointer-events: none;
+}
+
+.hallmap .l-stage {
+  fill: var(--paper);
+  font-weight: 700;
+}
+
+.hallmap .l-booth {
+  fill: color-mix(in srgb, var(--hc) 40%, var(--ink));
+}
+
+.hallmap .band {
+  fill: var(--ink);
+}
+
+.hallmap .band-t {
+  fill: var(--paper);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.hallmap .poi circle {
+  fill: var(--card);
+  stroke: var(--ink2);
+  stroke-width: 0.4;
+}
+
+.hallmap .poi.door circle {
+  fill: var(--ink);
+  stroke: var(--ink);
+}
+
+.hallmap .poi text {
+  fill: var(--ink2);
+  font-weight: 700;
+}
+
+.hallmap .poi.door text {
+  fill: var(--paper);
+}
+
+.hallmap .is-target,
+.hallmap .poi.is-target circle {
+  fill: var(--hc);
+  stroke: var(--ink);
+  stroke-width: 1;
+}
+
+.hallmap .poi.is-target text {
+  fill: var(--on-hall);
+}
+
+.hallmap .is-from,
+.hallmap .poi.is-from circle {
+  stroke: var(--ink);
+  stroke-width: 0.9;
+  stroke-dasharray: 1.6 1.2;
+}
+
+.hallmap .path-edge,
+.ovmap .ov-path-edge {
+  fill: none;
+  stroke: var(--card);
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.hallmap .path,
+.ovmap .ov-path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.hallmap .path-edge {
+  stroke-width: 2.6;
+}
+
+.hallmap .path {
+  stroke-width: 1.2;
+}
+
+.ovmap .ov-path-edge {
+  stroke-width: 9;
+}
+
+.ovmap .ov-path {
+  stroke-width: 4.5;
+}
+
+.ovmap .ov-hall {
+  fill: color-mix(in srgb, var(--hc) 20%, var(--card));
+  stroke: color-mix(in srgb, var(--hc) 55%, var(--card));
+  stroke-width: 1.2;
+  cursor: pointer;
+}
+
+.ovmap .ov-door {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.ovmap .ov-stage {
+  fill: var(--ink);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.ovmap .ov-n {
+  text-anchor: middle;
+  font-family: var(--mono);
+  font-weight: 700;
+  fill: color-mix(in srgb, var(--hc) 60%, var(--ink));
+  pointer-events: none;
+}
+
+.ovmap .ov-from {
+  fill: var(--card);
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+
+.ovmap .ov-to {
+  fill: var(--hc);
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+
+.pin {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.pin::before {
+  content: "";
+  position: absolute;
+  left: -9px;
+  top: -9px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid var(--ink);
+  background: var(--hc);
+  animation: ping 1.8s ease-out infinite;
+}
+
+/* A large target is already unmistakable as a coloured block; the ring is for small booths. */
+.pin.big::before {
+  display: none;
+}
+
+.pin.is-from::before {
+  left: -6px;
+  top: -6px;
+  width: 12px;
+  height: 12px;
+  background: var(--card);
+  border-width: 2.5px;
+  animation: none;
+}
+
+@keyframes ping {
+  from {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--hc) 60%, transparent);
+  }
+  to {
+    box-shadow: 0 0 0 14px color-mix(in srgb, var(--hc) 0%, transparent);
+  }
+}
+
+.pin span {
+  position: absolute;
+  left: 0;
+  bottom: calc(var(--lift, 0px) + 5px);
+  transform: translateX(-50%);
+  max-width: 62cqw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.55;
+  white-space: nowrap;
+}
+
+.pin.is-from span {
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pin.below span {
+  bottom: auto;
+  top: calc(var(--lift, 0px) + 5px);
+}
+
+.pin.at-left span {
+  transform: translateX(-14px);
+}
+
+.pin.at-right span {
+  transform: translateX(calc(-100% + 14px));
+}
+
+/* The card's own controls stay in reach above the "I'm at" bar while the card is on screen. */
+.foot {
+  position: sticky;
+  bottom: calc(66px + env(safe-area-inset-bottom));
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px -10px -10px;
+  padding: 8px 10px 10px;
+  border-radius: 0 0 13px 13px;
+  background: var(--card);
+}
+
+.foot:empty {
+  display: none;
+}
+
+.strip {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.strip-hall {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  opacity: 0.32;
+}
+
+.strip-hall:last-child {
+  flex: none;
+}
+
+.strip-hall::after {
+  content: "";
+  flex: 1;
+  height: 2px;
+  margin: 0 4px;
+  background: var(--rule2);
+}
+
+.strip-hall:last-child::after {
+  display: none;
+}
+
+.strip-hall.from,
+.strip-hall.to,
+.strip-hall.via {
+  opacity: 1;
+}
+
+.strip-hall.go-right::after,
+.strip-hall.go-left::after {
+  height: 3px;
+  background: var(--ink);
+}
+
+/* ------------------------------------------------------------ "I'm at", toast, sheet */
+
+.here {
+  position: fixed;
+  left: max(12px, env(safe-area-inset-left));
+  right: max(12px, env(safe-area-inset-right));
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  max-width: 28rem;
+  margin: 0 auto;
+  border-radius: 16px;
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+}
+
+.here button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.here-main {
+  flex: 1;
+  min-width: 0;
+  padding: 0 16px;
+}
+
+.here-main b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.here-k {
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+.here:not(.set) .here-k {
+  opacity: 1;
+}
+
+.here-clear {
+  flex: none;
+  padding: 0 16px 0 8px;
+  font: 400 21px/1 var(--mono) !important;
+  opacity: 0.8;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  z-index: 30;
+  transform: translateX(-50%);
+  max-width: calc(100% - 32px);
+  padding: 9px 16px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: var(--hl);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.toast[hidden] {
+  display: none;
+}
+
+.sheet {
+  width: 100%;
+  max-width: 30rem;
+  max-height: 86dvh;
+  min-height: 52dvh;
+  margin: auto auto 0;
+  padding: 16px 16px calc(18px + env(safe-area-inset-bottom));
+  border: 0;
+  border-radius: 22px 22px 0 0;
+  background: var(--card);
+  color: var(--ink);
+  overscroll-behavior: contain;
+}
+
+.sheet::backdrop {
+  background: rgb(0 0 0 / 0.5);
+}
+
+.sheet-close {
+  float: right;
+  width: 44px;
+  height: 44px;
+  margin: -8px -8px 0 0;
+  border: 0;
+  background: none;
+  font: 400 24px/1 var(--mono);
+  color: var(--ink2);
+}
+
+.sheet-title {
+  margin: 0 0 12px;
+  padding: 0;
+  border: 0;
+  font: 700 20px/1.25 var(--serif);
+}
+
+.sheet p {
+  margin: 10px 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.sheet .lead {
+  padding: 8px 12px;
+  border: 1px dashed var(--rule2);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.limits {
+  margin: 6px 0 12px;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.limits li {
+  margin: 6px 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,70 @@
+// Keeps the map working without a connection. The whole site is a page, a script, a stylesheet,
+// the floor data and a handful of drawings; all of it is fetched at install.
+const CACHE = "wayfinder-" + {{ build.id | json }};
+const PRECACHE = {{ precache | json }};
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open(CACHE);
+      await Promise.allSettled(
+        PRECACHE.map(async (url) => {
+          const res = await fetch(url, { cache: "no-cache" });
+          if (res.ok) await cache.put(url, res);
+        }),
+      );
+      await self.skipWaiting();
+    })(),
+  );
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    (async () => {
+      for (const key of await caches.keys()) {
+        if (key.startsWith("wayfinder-") && key !== CACHE) await caches.delete(key);
+      }
+      await self.clients.claim();
+    })(),
+  );
+});
+
+self.addEventListener("fetch", (event) => {
+  const req = event.request;
+  const url = new URL(req.url);
+  if (req.method !== "GET" || url.origin !== self.location.origin || url.pathname === "/sw.js") return;
+
+  if (url.pathname.startsWith("/assets/")) {
+    // Hashed filenames never change content.
+    event.respondWith(
+      (async () => {
+        const hit = await caches.match(req);
+        if (hit) return hit;
+        const res = await fetch(req);
+        if (res.ok) (await caches.open(CACHE)).put(req, res.clone());
+        return res;
+      })(),
+    );
+    return;
+  }
+
+  // The page itself: the network when it answers within a few seconds, the kept copy otherwise.
+  // Every address of this site (/?to=…) is the same page, so the query is ignored when matching.
+  event.respondWith(
+    (async () => {
+      const kept = await caches.match("/", { ignoreSearch: true });
+      const fresh = fetch(req).then(async (res) => {
+        if (res.ok && url.pathname === "/") (await caches.open(CACHE)).put("/", res.clone());
+        return res;
+      });
+      if (!kept) return fresh;
+      event.waitUntil(fresh.catch(() => undefined));
+      const slow = new Promise((resolve) => setTimeout(() => resolve(null), 3000));
+      try {
+        return (await Promise.race([fresh, slow])) || kept;
+      } catch {
+        return kept;
+      }
+    })(),
+  );
+});

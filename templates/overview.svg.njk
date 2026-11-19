@@ -1,0 +1,13 @@
+{# The whole floor in plan coordinates: the halls along the building's arc, their stages, the entrance sides. #}
+<svg xmlns="http://www.w3.org/2000/svg" class="ovmap" viewBox="{{ vb | join(" ") }}">
+{% for h in halls %}
+<polygon class="ov-hall h{{ h.hall }}" data-hall="{{ h.hall }}" points="{{ h.points }}"/>
+<path class="ov-door" d="{{ h.door }}"/>
+{% endfor %}
+{% for s in stages %}
+<polygon class="ov-stage" points="{{ s }}"/>
+{% endfor %}
+{% for h in halls %}
+<text class="ov-n h{{ h.hall }}" x="{{ h.cx }}" y="{{ h.cy + text * 0.36 }}" font-size="{{ text }}">{{ h.hall }}</text>
+{% endfor %}
+</svg>

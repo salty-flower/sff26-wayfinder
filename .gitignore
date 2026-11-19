@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist.next/
+dist.prev/
+
+# The organiser's floor plan and walkway graph, downloaded at build time. Not redistributed.
+data/
+
+# Build and deploy state
+.cache/
+.wrangler/
+
+# Local settings
+.env
+.env.*
+!.env.example
+
+# Screenshots from tools/check.ts
+shots/
